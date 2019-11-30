@@ -49,7 +49,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import rebus.permissionutils.AskagainCallback;
+import rebus.permissionutils.AskAgainCallback;
 import rebus.permissionutils.PermissionEnum;
 import rebus.permissionutils.PermissionManager;
 import rebus.permissionutils.PermissionUtils;
@@ -97,18 +97,18 @@ public class HiveRecordingsFragment extends Fragment
         View root = inflater.inflate(R.layout.hive_recordings_frag, container, false);
 
         // Set up recordings list view
-        RecyclerView recyclerView = (RecyclerView) root.findViewById(R.id.recordings_list);
-        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+        RecyclerView recyclerView = root.findViewById(R.id.recordings_list);LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(llm);
         recyclerView.setAdapter(listAdapter);
-        hivesView = (LinearLayout) root.findViewById(R.id.recordingsLL);
+        hivesView = root.findViewById(R.id.recordingsLL);
 
         // Set up  no recordings view
         noRecordingsView = root.findViewById(R.id.no_recordings);
 
         // Set up floating action button
-        fab = (FloatingActionButton) getActivity().findViewById(R.id.fab_new_recording);
-        fab.setOnClickListener(new View.OnClickListener() {
+        
+		fab = getActivity().findViewById(R.id.fab_new_recording);
+		fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 presenter.startNewRecording();
@@ -221,11 +221,11 @@ public class HiveRecordingsFragment extends Fragment
             return true;
         }
         // Ask for permission
-        PermissionManager.with(getActivity())
+        PermissionManager.Builder()
                 .permission(PermissionEnum.CAMERA)
-                .askagain(true)
-                .askagainCallback(new AskagainCallback() {
-                    @Override
+				.askAgain(true)
+                .askAgainCallback(new AskAgainCallback() {
+					@Override
                     public void showRequestPermission(final UserResponse response) {
                         new AlertDialog.Builder(getActivity())
                                 .setTitle(getString(R.string.permission_request_title))
@@ -261,14 +261,15 @@ public class HiveRecordingsFragment extends Fragment
                         }
                     }
                 })
-                .ask();
+                .ask(getActivity());
         return false;
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
-        PermissionManager.handleResult(requestCode, permissions, grantResults);
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        PermissionManager.handleResult(this, requestCode, permissions, grantResults);
     }
 
     @Override
